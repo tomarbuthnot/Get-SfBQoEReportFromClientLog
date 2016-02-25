@@ -392,15 +392,29 @@ Function ConvertTo-FlatObject {
 # Default Log Path for SfB 2016 16.x client
 $CurrentLogFile = Get-Content $env:LOCALAPPDATA\Microsoft\Office\16.0\Lync\Tracing\Lync-UccApi-0.UccApilog
 
-$QoEReports = $CurrentLogFile | Select-String -SimpleMatch "</VQReportEvent>"
+# Grab QoE and Error Reports
+$QoEReports = $CurrentLogFile | Select-String -SimpleMatch "</VQReportEvent>","error-reporting"
+
 
 Foreach ($QoEReport in $QoEReports)
         {
+        # Catch for Error reports that have no content
+        If (($QoEReport.Line.Length) -gt 90)
 
-        $xml2 = [xml]$QoEReport
+                {
+        
+                $xml2 = [xml]$QoEReport
 
-        $flat = $xml2 | ConvertTo-FlatObject
+                $flat = $xml2 | ConvertTo-FlatObject
 
-        Write-Host " "
-        $flat
+                Write-Host " "
+                Write-Host "Report Start"
+                Write-Host " "
+                $flat
+                Write-Host "############################"
+                }
+        
         }
+
+
+
